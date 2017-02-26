@@ -1,0 +1,1253 @@
+﻿// ==PREPROCESSOR==
+// @import "%fb2k_profile_path%wsh_br3tt\jsplaylist\js\WSHcommon.js"
+// @import "%fb2k_profile_path%marc2003\common8.js"
+// @name "Thumbs"
+// @feature "v1.4"
+// @feature "watch-metadb"
+// ==/PREPROCESSOR==
+//the track info section displays 3 lines of title formatted text. you can customise that here/////////////////////////////////////////////
+var test = 1;
+
+function Format_hms(t) {
+    var hms;
+    if (t) {
+        switch (t.length) {
+            case 4:
+                hms = "0" + t;
+                break;
+            case 5:
+                hms = "" + t;
+                break;
+            case 7:
+                hms = "0" + t;
+                break;
+            default:
+                hms = t;
+                break
+        }
+
+        return hms
+    } else {
+        return "00:00"
+    }
+
+}
+
+
+
+
+//$puts(info1c.color,$if($stricmp($substr(%path%,1,4),http),$get(active.color),$get(back.color)))
+//$puts(info2a.color,$if($stricmp(%__mp3_stereo_mode%,JOINT STEREO),$get(active.color),$get(back.color)))
+//$puts(info2b.color,$if($stricmp(%channels%,stereo),$get(active.color),$get(back.color)))
+//$puts(info2c.color,$if($stricmp(%channels%,MONO),$get(active.color),$get(back.color)))
+//$puts(info3a.color,$if($stricmp($info(encoding),lossy),$get(active.color),$get(back.color)))
+//$puts(info3b.color,$if($stricmp($info(encoding),lossy),$get(back.color),$get(active.color)))
+//$puts(info3c.color,$if($stricmp(%codec%,flac),$get(active.color),$get(back.color)))
+//$puts(info3d.color,$if($stricmp(%codec%,pcm),$get(active.color),$get(back.color)))
+
+
+
+
+var vX = 65;
+var vY = 60;
+var vW = 60
+var vH = 60;
+
+
+var listH = 155;
+
+
+var sty =-70;
+
+var x = 310; //similer artist panel adjust
+var z = 45; //info adjust
+
+var infoMinX = 175;
+var infoY = 20;
+var i = -30;
+
+var pbx =25; //plybackbuttons x
+var pby = 108;
+var obx = 130;
+var oby = 65;
+var artistX = 30;
+var artistY = 10;
+var artistW = 450;
+var artistH = 128;
+
+var cX = -37;
+var cY = 333;
+
+
+var cW = 318;
+var cHmin = 350;
+var cH = cW;
+
+var codecX = 20;
+
+var codecY = -50;
+var rX = 380 - codecX;
+var rY = 110 + codecY;
+
+pls = window.GetProperty("FB Playlist", "YT Radio");
+
+var codec = "mp3";
+var trackPath = "";
+
+var line1 = {
+    text: "", //leave this blank
+    tf: "%artist%", //enter any title formatting
+    font: gdi.Font("PCDE", 75, 3), //font name, size, style. 1 means bold and 0 is normal.
+    fontMin: gdi.Font("PCDE", 60, 3),
+    colour: RGB(240, 240, 240), //colour
+    y: 0 //change this value to move text up or down.
+}
+
+var line11 = {
+    text: "", //leave this blank
+    tf: "%artist%", //enter any title formatting
+    font: gdi.Font("Cabiri", 13, 0),
+    fontMin: gdi.Font("Cabiri", 10, 0),
+    colour: colorSchemeText & 0x22ffffff,
+    y: 40,
+    x: 290,
+    xMin: 140 + infoMinX,
+    yMin:85+ infoY
+}
+var line2 = {
+    text: "",
+    tf: "%title%",
+    font: gdi.Font("PCDE", 60, 3),
+    fontmin: gdi.Font("PCDE", 35, 3),
+    colour: RGB(210, 210, 210),
+    y: -40 ,
+    x: 270,
+    xMin: 122 + infoMinX,
+    yMIn:-35- infoY
+}
+var line3 = {
+    text: "",
+    tf: "[$ascii($replace(%album%,/,-))]",
+    font: gdi.Font("Cabiri", 13, 0),
+    fontMin: gdi.Font("Cabiri", 10, 0),
+    colour: colorSchemeText & 0x22ffffff,
+    y: 22 ,
+    x: 290,
+    xMin: 140 + infoMinX,
+    yMin:65+ infoY
+}
+var line4 = {
+    text: "",
+    tf: "[%path%]",
+    font: gdi.Font("cabiri", 10, 1),
+    colour: RGB(180, 180, 180),
+    y: 137
+}
+
+
+var line5 = {
+    text: "",
+    tf: "[%bitrate%]" + " Kbps", // + " :: " + "[%codec_profile%]"
+    font: gdi.Font("Score board", 11, 1),
+    colour: RGB(180, 180, 180),
+    y: 45 - codecY,
+    x: 315 - codecX
+}
+
+var line6 = {
+    text: "",
+    tf: "$if($strcmp(%__bitspersample%$div($info(samplerate),1000),1644),16bit-44.1kHz)$if($or($strcmp($info(codec),DST64),$strcmp($info(codec),DSD64)),SACD-$info(bitspersample)bit-$div($info(samplerate),1000)kHz,$if($strcmp($info(bitspersample)$max($info(samplerate),45000),$max($info(bitspersample),24)$info(samplerate)),DVD-Audio/LP-$info(bitspersample)bit-$div($info(samplerate),1000)kHz))$if(%__hdcd%,HDCD-20bit-44.1kHz)$if($strcmp($info(encoding),lossy),Lossy-$div($info(samplerate),1000)kHz)", // + " :: " + "[%codec_profile%]"
+    font: gdi.Font("AvantGarde Bk BT", 10, 1),
+    colour: RGB(180, 180, 180),
+    y: 60 - codecY,
+    x: 315 - codecX
+}
+
+
+
+
+function DrawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, line_color, fill_color, angle, opacity) {
+
+    if (!opacity && opacity != 0) opacity = 255;
+
+    //---> Create points
+
+    var point_arr = [];
+
+    for (var i = 0; i != points; i++) {
+
+        i % 2 ? rad = Math.round((out_radius - line_thickness * 4) / 2) / in_radius : rad = Math.round((out_radius - line_thickness * 4) / 2);
+
+        var x_point = Math.floor(rad * Math.cos(Math.PI * i / points * 2 - Math.PI / 2));
+        var y_point = Math.ceil(rad * Math.sin(Math.PI * i / points * 2 - Math.PI / 2));
+
+        point_arr.push(x_point + out_radius / 2);
+        point_arr.push(y_point + out_radius / 2);
+
+    }
+
+    //---> Crate poligon image
+
+    var img = gdi.CreateImage(out_radius, out_radius);
+    var _gr = img.GetGraphics();
+
+    _gr.SetSmoothingMode(2);
+
+    _gr.FillPolygon(fill_color, 1, point_arr);
+
+    if (line_thickness > 0)
+        _gr.DrawPolygon(line_color, line_thickness, point_arr);
+
+    img.ReleaseGraphics(_gr);
+
+    //---> Draw image
+
+    gr.DrawImage(img, x, y, out_radius, out_radius, 0, 0, out_radius, out_radius, angle, opacity);
+
+}
+
+
+
+//  DarkOne volbar
+
+
+
+var configPath = fb.ProfilePath + "sam92\\";
+var imgPath = configPath + "images\\";
+var g_signs = gdi.Image(imgPath + "Signs.png");
+
+var btn_font = gdi.Font("Arial Black", 7, 0);
+var ui_type = window.InstanceType;
+
+var g_imgv = gdi.Image(imgPath + "Volume.png");
+var v_change = false;
+var g_drag = false;
+var g_angle = 270;
+var v_size = 60;
+var i_size = 10;
+var pad = 5;
+
+function VolumeKnob(x, y, w, h) {
+    this.left = x;
+    this.top = y;
+    this.w = w;
+    this.h = h;
+    this.right = x + w;
+    this.bottom = y + h;
+
+    this.traceMouse = function(x, y) {
+        return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
+    }
+
+    this.changePos = function(x, y, w, h) {
+        this.left = x;
+        this.top = y;
+        this.w = w;
+        this.h = h;
+        this.right = x + w;
+        this.bottom = y + h;
+    }
+
+    this.calc_theta = function(x, y) {
+        x -= this.left + this.w / 2;
+        y -= this.top + this.h / 2;
+        theta = Math.atan2(y, x) / Math.PI * 180;
+        if (theta <= 90 && theta > 45) return g_angle;
+        if (theta > 90 && theta < 135) return 0;
+        return theta >= 0 ? theta > 90 ? theta - 135 : theta + 225 : theta + 225
+    }
+
+    this.draw = function(gr) {
+        var g_R = Math.min(this.w, this.h) / Math.PI;
+
+        gr.GdiDrawText("VOLUME", btn_font, RGB(255, 255, 255), this.left, this.top - 12, this.w, 16, 33);
+        g_imgv && gr.DrawImage(g_imgv, this.left, this.top, this.w, this.h, 0, 0, vW, vH);
+
+        theta = (Math.pow(10, fb.Volume / 50) - 0.001) / 0.999 * g_angle;
+        posA = (theta - 45) * Math.PI / 180;
+        cosinusA = Math.cos(posA);
+        sinusA = Math.sin(posA);
+        posX = (this.left + (this.w / 2) - pad) - (cosinusA * g_R);
+        posY = (this.top + (this.h / 2) - pad) - (sinusA * g_R);
+
+        x_offset = fb.Volume == -100 ? v_size + 2 * i_size : v_change ? v_size + i_size : v_size;
+        g_imgv && gr.DrawImage(g_imgv, posX, posY, i_size, i_size, x_offset, 0, i_size, i_size);
+    }
+
+    this.Repaint = function() {
+        window.RepaintRect(this.left, this.top, this.w, this.h);
+    }
+
+    this.on_mouse_move = function(x, y) {
+        if (this.traceMouse(x, y) && g_drag) {
+            n = this.calc_theta(x, y) / g_angle;
+            v = 50 * Math.log(0.99 * n + 0.01) / Math.LN10;
+            if (fb.Volume != v) fb.Volume = v;
+        }
+
+        this.mouseX = x;
+        this.mouseY = y;
+    }
+
+    this.on_mouse_lbtn_down = function(x, y) {
+        g_drag = true;
+    }
+
+    this.on_mouse_lbtn_up = function(x, y) {
+        this.on_mouse_move(x, y);
+        g_drag = false;
+    }
+
+    this.on_mouse_wheel = function(step) {
+        if (this.traceMouse(this.mouseX, this.mouseY)) step > 0 ? fb.VolumeUp() : fb.VolumeDown();
+    }
+
+    this.on_mouse_rbtn_up = function(x, y) {
+        var m = window.CreatePopupMenu();
+        var q;
+
+        m.AppendMenuItem(fb.Volume == 0 ? 1 : 0, 1, "Up");
+        m.AppendMenuItem(fb.Volume == -100 ? 1 : 0, 2, "Down");
+        m.AppendMenuItem(fb.Volume == -100 ? 8 : 0, 3, "Volume Mute");
+        m.AppendMenuSeparator();
+        m.AppendMenuItem(fb.Volume == 0 ? 8 : 0, 4, "Set to -0 db");
+        m.AppendMenuItem(fb.Volume == -3 ? 8 : 0, 5, "Set to -3 db");
+        m.AppendMenuItem(fb.Volume == -6 ? 8 : 0, 6, "Set to -6 db");
+        m.AppendMenuItem(fb.Volume == -9 ? 8 : 0, 7, "Set to -9 db");
+        m.AppendMenuItem(fb.Volume == -12 ? 8 : 0, 8, "Set to -12 db");
+        m.AppendMenuItem(fb.Volume == -15 ? 8 : 0, 9, "Set to -15 db");
+        m.AppendMenuItem(fb.Volume == -18 ? 8 : 0, 10, "Set to -18 db");
+        m.AppendMenuItem(fb.Volume == -21 ? 8 : 0, 11, "Set to -21 db");
+
+        q = m.TrackPopupMenu(x, y);
+
+        switch (true) {
+            case (q == 1):
+                fb.VolumeUp();
+                break;
+
+            case (q == 2):
+                fb.VolumeDown();
+                break;
+
+            case (q == 3):
+                fb.VolumeMute();
+                break;
+
+            case (q == 4):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -0 db");
+                break;
+
+            case (q == 5):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -3 db");
+                break;
+
+            case (q == 6):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -6 db");
+                break;
+
+            case (q == 7):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -9 db");
+                break;
+
+            case (q == 8):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -12 db");
+                break;
+
+            case (q == 9):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -15 db");
+                break;
+
+            case (q == 10):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -18 db");
+                break;
+
+            case (q == 11):
+                fb.RunMainMenuCommand("Playback" + "/" + "Volume" + "/" + "Set to -21 db");
+                break;
+        }
+
+        m.Dispose();
+    }
+}
+
+
+
+//  DarkOne volbar enddd
+
+
+
+
+/////////get album main colur
+
+
+var gRed, gGreen, gBlue, gAlpha;
+var colorSchemeBack = -14671840;
+var colorSchemeBackL = -14671840;
+var colorSchemeTextD=-5263441;
+var colorSchemeDark;
+var colorSchemeText = -5263441;
+var g_colorScheme_array = Array();
+var tempColor;
+function getColorSchemeFromImage(image) {
+    if (!image) return;
+
+    var left_img = gdi.CreateImage(30, 50);
+    var gb = left_img.GetGraphics();
+    var colorScheme_array = Array();
+
+    gb.DrawImage(image, 0, 0, image.Width, image.Height, 7, 7, image.Width - 14, image.Height - 14, 0, 255);
+    left_img.ReleaseGraphics(gb);
+
+    //var myVBArray = image.Resize(50,50,2).GetColorScheme(1);
+    var myVBArray = left_img.GetColorScheme(1);
+
+    colorScheme_array.splice(0, colorScheme_array.length);
+    colorScheme_array = myVBArray.toArray();
+
+    gRed = getRed(colorScheme_array[0]);
+    gGreen = getGreen(colorScheme_array[0]);
+    gBlue = getBlue(colorScheme_array[0]);
+    gAlpha = getAlpha(colorScheme_array[0]);
+    colorSchemeBack = RGBA(gRed, gGreen, gBlue, 255);
+
+    //var tmp_HSL_colour = RGB2HSL(this.colorSchemeBack);
+    var tmp_HSL_colour = RGB2HSL(colorScheme_array[0]);
+    var new_H = tmp_HSL_colour.H;
+    var new_S = tmp_HSL_colour.S > 80 ? (tmp_HSL_colour.L < 40 ? tmp_HSL_colour.S - 60 : tmp_HSL_colour.S) : tmp_HSL_colour.S;
+    if (tmp_HSL_colour.S > 60) {
+        var new_L = (tmp_HSL_colour.L > 40 ? tmp_HSL_colour.L - 40 : tmp_HSL_colour.L + 40);
+    } else {
+        var new_L = (tmp_HSL_colour.L > 50 ? tmp_HSL_colour.L - 50 : tmp_HSL_colour.L + 40);
+    }
+    var new_L = tmp_HSL_colour.L < 60 ? tmp_HSL_colour.L + 50 : tmp_HSL_colour.L - 50;
+    colorSchemeText = HSL2RGB(new_H, new_S, new_L, "RGB");
+    colorSchemeText = blendColors(colorSchemeText, RGB(255, 255, 255), 0.15);
+    
+    
+    fb.trace( "##########################################################");
+      fb.trace( "colorSchemeBack:"+colorSchemeBack);
+     fb.trace(  "colorSchemeText: "+colorSchemeText);
+    //fb.trace( "backColorScheme: "+backColorScheme);
+    fb.trace( colorSchemeBack>colorSchemeText?"colorSchemeBack>colorSchemeText":"colorSchemeText>colorSchemeBack");
+     fb.trace( "difference: "+(colorSchemeText-colorSchemeBack))
+     fb.trace( "######################################################");
+    
+     fb.trace("!@#%!%#!$!@#!$!@#$@!$@#"+getRed(colorSchemeBack));
+    var limit = 33;
+  
+  
+ var rr = getRed(colorSchemeBack)<limit ? true :false;
+ var gg = getGreen(colorSchemeBack)<limit ? true :false; 
+ var bb = getBlue(colorSchemeBack)<limit ? true :false; 
+ 
+ var oo= rr&&gg?1:0;
+ var tt= rr&&gg?1:0;
+ var hh= rr&&gg?1:0;
+ var ggwp = oo==1 || tt==1 || hh==1;
+  fb.trace("%%%%%%%%%%%%%%%%%%"+ggwp);
+  if(ggwp&&test)
+    {
+    tempColor =colorSchemeBack; 
+  colorSchemeBack=colorSchemeText;
+   colorSchemeText=tempColor; 
+  }
+  // if(colorSchemeBack< -14660000&&test){
+ //     tempColor =colorSchemeBack; 
+ //  colorSchemeBack=colorSchemeText;
+ //   colorSchemeText=tempColor;  
+ //  }else{}
+ 
+    
+      colorSchemeText>colorSchemeBack ? backColorScheme =blendColors(-16777216, colorSchemeBack, 0.3125)  : backColorScheme =blendColors(-16777216, colorSchemeText, 0.3125) ;
+      
+      colorSchemeText>colorSchemeBack ? colorSchemeBackL=colorSchemeText :colorSchemeBackL=colorSchemeBack;
+      
+      colorSchemeText>colorSchemeBack ? colorSchemeDark=blendColors(-16777216, colorSchemeBack, 0.7125) :colorSchemeDark=colorSchemeText;
+   
+
+    window.NotifyOthers("colorSchemeBack", colorSchemeBack);
+    window.NotifyOthers("colorSchemeText", colorSchemeText);
+    window.NotifyOthers("backColorScheme", backColorScheme);
+    window.NotifyOthers("colorSchemeDark", colorSchemeDark);
+    
+    
+    
+    fb.trace( "-------------------------------------------------------------");
+      fb.trace( "colorSchemeBack:"+colorSchemeBack);
+     fb.trace(  "colorSchemeText: "+colorSchemeText);
+    fb.trace( "backColorScheme: "+backColorScheme);
+    fb.trace( colorSchemeBack>colorSchemeText?"colorSchemeBack>colorSchemeText":"colorSchemeText>colorSchemeBack");
+     fb.trace( "difference: "+(colorSchemeText-colorSchemeBack))
+     fb.trace( "-------------------------------------------------------------");
+    //  fb.trace( "rgb colorSchemeBack: "+ toRGB(colorSchemeBack)); 
+    //  fb.trace( "rgb colorSchemeText: "+toRGB(colorSchemeText) ); 
+
+    var rgbBack = toRGB(colorSchemeBack);
+    // var redb =;
+    var backColorText = getRed(colorSchemeBack) + "-" + getGreen(colorSchemeBack) + "-" + getBlue(colorSchemeBack);
+    var textColorText = getRed(colorSchemeText) + "-" + getGreen(colorSchemeText) + "-" + getBlue(colorSchemeText);
+     var backColorSchemeText = getRed(backColorScheme) + "-" + getGreen(backColorScheme) + "-" + getBlue(backColorScheme);
+    var colorSchemeDarkText = getRed(colorSchemeDark) + "-" + getGreen(colorSchemeDark) + "-" + getBlue(colorSchemeDark);
+
+
+    var ColorScheme = update_option("ColorScheme", backColorText);
+    var textColorScheme = update_option("textColorScheme", textColorText);
+    var backColorSchemeText = update_option("backColorSchemeText", backColorSchemeText);
+    var colorSchemeDark = update_option("colorSchemeDark", colorSchemeDarkText);
+
+
+    var wshbackColorText = getRed(colorSchemeBack) + "," + getGreen(colorSchemeBack) + "," + getBlue(colorSchemeBack);
+    var wshtextColorText = getRed(colorSchemeText) + "," + getGreen(colorSchemeText) + "," + getBlue(colorSchemeText);
+
+    //   fb.trace( "rgb backColorText: "+ backColorText); 
+    // fb.trace( "1111: "+ getRed(colorSchemeBack)); 
+
+    
+
+    if(colorSchemeBack>colorSchemeText){
+    var btnColorText = getRed(colorSchemeBack) + "-" + getGreen(colorSchemeBack) + "-" + getBlue(colorSchemeBack);
+var backColor = getRed(colorSchemeText) + "-" + getGreen(colorSchemeText) + "-" + getBlue(colorSchemeText);
+    
+}else{
+    var btnColorText = getRed(colorSchemeText) + "-" + getGreen(colorSchemeText) + "-" + getBlue(colorSchemeText);
+    var backColor = getRed(colorSchemeBack) + "-" + getGreen(colorSchemeBack) + "-" + getBlue(colorSchemeBack);
+    }
+var btnColor = update_option("btnColor",  btnColorText);
+    
+    var wshColorScheme = update_option("wshColorScheme", wshbackColorText);
+    var wshtextColorScheme = update_option("wshtextColorScheme", wshtextColorText);
+            
+  var backColor = update_option("backColor", backColor);
+
+
+
+
+
+}
+
+
+
+
+/////////get album main colur enddd
+
+
+
+
+var g_image_list = "";
+
+var g_img = null;
+var g_valid_tid = 0;
+
+
+
+
+function on_every_5000_seconds(timer_id) {
+    load_random_image_async();
+}
+
+// After loading image is done in the background, this callback will be invoked
+function on_load_image_done(tid, image) {
+    if (g_valid_tid == tid) {
+        // Dispose previous image, in order to save memory
+        g_img && g_img.Dispose();
+        g_img = image;
+        window.RepaintRect(artistX, artistY, artistW, artistH);
+        //window.Repaint();
+    }
+}
+// Trigger every 5 seconds.
+var g_timer = window.SetInterval(on_every_5000_seconds, 6000);
+
+load_random_image_async();
+
+function load_random_image_async() {
+    // Load a random image from the list
+    var g_image_list = [];
+
+
+
+    //MY version
+    g_image_list = utils.Glob("F:\\Music\\fanart\\" + fb.TitleFormat("%artist%").Eval() + "\\*.png").toArray(), utils.Glob("E:\\Music\\fanart\\" + fb.TitleFormat("%artist%").Eval() + "\\*.jpg").toArray();
+
+    //Public version
+    //g_image_list = utils.Glob(fb.ProfilePath+"wsh_fanart_musiclogo\\" + fb.TitleFormat("%artist%").Eval() + "\\*.png").toArray(), utils.Glob("%fb2k_profile_path%"+"wsh_fanart_musiclogo\\" + fb.TitleFormat("%artist%").Eval() + "\\*.jpg").toArray();
+
+
+
+    var path = g_image_list[Math.floor(Math.random() * g_image_list.length)];
+    //fb.trace(path);
+    g_valid_tid = gdi.LoadImageAsync(window.ID, path);
+}
+
+
+
+
+var ForReading = 1;
+var ForWriting = 2;
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+
+var sdir = fb.ProfilePath + "sam92\\settings\\";
+
+function read_option(opt, val) {
+    var odir = sdir + opt + "\\";
+    if (!fso.FolderExists(odir)) {
+        fso.CreateFolder(odir)
+    } else {
+        var e = new Enumerator(fso.GetFolder(odir).Files);
+        var s;
+        for (; !e.atEnd(); e.moveNext()) {
+            s = e.item();
+            if (utils.PathWildcardMatch("*", s.Name)) {
+                return s.Name
+            }
+
+        }
+
+    }
+    fso.CreateTextFile(odir + val, ForWriting);
+    return val
+}
+
+function update_option(opt, val) {
+    var odir = sdir + opt + "\\";
+    if (!fso.FolderExists(odir)) {
+        fso.CreateFolder(odir);
+        fso.CreateTextFile(odir + val, ForWriting)
+    } else {
+        var e = new Enumerator(fso.GetFolder(odir).Files);
+        var s;
+        for (; !e.atEnd(); e.moveNext()) {
+            s = e.item();
+            if (utils.PathWildcardMatch("*", s.Name)) {
+                fso.MoveFile(odir + s.Name, odir + val);
+                break
+            }
+
+        }
+
+    }
+    return val
+}
+
+
+function RefreshBG() {
+    if (fb.IsPlaying || fb.IsPaused) {
+        fb.RunMainMenuCommand("Playback/Play or Pause");
+        fb.RunMainMenuCommand("Playback/Play or Pause");
+    } else {
+        fb.RunMainMenuCommand("Playback/Play");
+        fb.RunMainMenuCommand("Playback/Stop");
+    }
+    window.Repaint();
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+var p = new panel("Thumbs", ["remap", "custom_background"]);
+
+
+//var rY=440;
+
+
+//p.data_folder = "X:\\PRIVATE\\marc2003\\";
+
+//My version
+p.artists_folder = "F:\\Music\\eng\\";
+
+window.SetProperty("2k3.musicbrainz_releases", false);
+
+
+
+var th = new thumbs();
+th.mode = th.modes.off;
+var r = new rating(0, 4, 22);
+var b = new buttons("playback");
+var bs = 32; //button size
+var c = new cd(0, 0, p.w, p.h);
+var l = new lastfm();
+volknob = new VolumeKnob(vX, vY, vW, vH);
+
+//if you want to change the images, uncomment these lines below and modify the paths accordingly
+//do not use fb.FoobarPath here as fb.ProfilePath already points to the same location if using portable mode
+b.images.stop = gdi.Image(fb.ProfilePath + "sam92\\images\\stop.png");
+b.images.stoph = gdi.Image(fb.ProfilePath + "sam92\\images\\stop_h.png");
+b.images.play = gdi.Image(fb.ProfilePath + "sam92\\images\\play.png");
+b.images.playh = gdi.Image(fb.ProfilePath + "sam92\\images\\play_h.png");
+b.images.pause = gdi.Image(fb.ProfilePath + "sam92\\images\\pause.png");
+b.images.pauseh = gdi.Image(fb.ProfilePath + "sam92\\images\\pause_h.png");
+b.images.previous = gdi.Image(fb.ProfilePath + "sam92\\images\\previous.png");
+b.images.previoush = gdi.Image(fb.ProfilePath + "sam92\\images\\prev_h.png");
+b.images.next = gdi.Image(fb.ProfilePath + "sam92\\images\\next.png");
+b.images.nexth = gdi.Image(fb.ProfilePath + "sam92\\images\\next_h.png");
+
+b.images.album = gdi.Image(fb.ProfilePath + "sam92\\images\\album.png");
+b.images.bartist = gdi.Image(fb.ProfilePath + "sam92\\images\\bartist.png");
+b.images.artist = gdi.Image(fb.ProfilePath + "sam92\\images\\artist.png");
+
+b.images.similar = gdi.Image(fb.ProfilePath + "sam92\\images\\similar.png");
+
+b.images.sartist = gdi.Image(fb.ProfilePath + "sam92\\images\\sartist.png");
+b.images.sartisth = gdi.Image(fb.ProfilePath + "sam92\\images\\sartisth.png");
+b.images.tags = gdi.Image(fb.ProfilePath + "sam92\\images\\tags.png");
+b.images.tagsh = gdi.Image(fb.ProfilePath + "sam92\\images\\tagsh.png");
+b.images.talbum = gdi.Image(fb.ProfilePath + "sam92\\images\\talbum.png");
+b.images.talbumh = gdi.Image(fb.ProfilePath + "sam92\\images\\talbumh.png");
+b.images.top = gdi.Image(fb.ProfilePath + "sam92\\images\\top.png");
+b.images.toph = gdi.Image(fb.ProfilePath + "sam92\\images\\toph.png");
+
+
+b.images.library = gdi.Image(fb.ProfilePath + "sam92\\images\\library.png");
+b.images.libraryh = gdi.Image(fb.ProfilePath + "sam92\\images\\libraryh.png");
+b.images.nowPlaying = gdi.Image(fb.ProfilePath + "sam92\\images\\nowPlaying.png");
+
+
+
+b.images.playlist = gdi.Image(fb.ProfilePath + "sam92\\images\\playlist.png");
+b.images.playlisth = gdi.Image(fb.ProfilePath + "sam92\\images\\playlisth.png");
+
+b.images.video = gdi.Image(fb.ProfilePath + "sam92\\images\\video.png");
+
+var li = new list("lastfm", 500, p.h + 50, p.w - 30, p.h - 30);
+
+
+
+
+var columns = 0;
+
+
+li.lastfm_change_mode = function(m) {
+    this.lastfm_mode = m;
+    window.SetProperty("2k3.lastfm_mode", this.lastfm_mode);
+    //store the value so it's remembered on panel reload/foobar restart
+
+    this.artist = ""; //the panel won't update if the artist doesn't change so i just clear it
+    p.item_focus_change(); //this calls the function that refreshes the panel - don't repaint because it's already done for you
+   // b.update();
+}
+
+//function takes 3 values: x, y, size. see on_size function if you want to update these relative to panel width/height
+var ps = new playcount_sync(3, 0, 32);
+
+
+
+
+b.update = function() {
+    b.buttons.stop = new button((p.w - bs * 6) + pbx, p.h - pby, bs, bs, {
+        normal: this.images.stop,
+        hover: this.images.stoph
+    }, function() {
+        fb.Stop();
+    }, "");
+    b.buttons.play = new button((p.w - bs * 6) + bs * 2 + 5 + pbx, p.h - pby - 17, bs + 35, bs + 35, {
+        normal: !fb.IsPlaying || fb.IsPaused ? this.images.play : this.images.pause,
+        hover: !fb.IsPlaying || fb.IsPaused ? this.images.playh : this.images.pauseh
+    }, function() {
+        fb.PlayOrPause();
+    }, !fb.IsPlaying || fb.IsPaused ? "" : "");
+    b.buttons.previous = new button((p.w - bs * 6) + bs + 10 + pbx, p.h - pby, bs, bs, {
+        normal: this.images.previous,
+        hover: this.images.previoush
+    }, function() {
+        fb.Prev();
+    }, "");
+    b.buttons.next = new button((p.w - bs * 6) + bs * 3 + 35 + pbx, p.h - pby, bs, bs, {
+        normal: this.images.next,
+        hover: this.images.nexth
+    }, function() {
+        fb.Next();
+    }, "");
+    b.buttons.artist = new button(p.w < 668 ? line11.xMin - 23 : line11.x - 30,p.w < 668 ?  p.h - line11.yMin - 5:p.h - line11.y - 5, 20, 20, {
+        normal: this.images.artist
+    }, function() {
+        fb.RunContextCommand("Quicksearch for same/Artist")
+    }, "Same Artist");
+    b.buttons.album = new button(p.w < 668 ? line3.xMin - 23 : line3.x - 30, p.w < 668 ?  p.h - line3.yMin - 5:p.h - line3.y - 5, 20, 20, {
+        normal: this.images.album
+    }, function() {
+        fb.RunContextCommand("Quicksearch for same/Album")
+    }, "Same Album");
+    b.buttons.similar = new button((p.w - bs * 6) + bs * 3 - 170 + obx, p.h - oby, 30, 30, {
+        normal: this.images.similar
+    }, function() {
+
+        //fb.RunContextCommand("Last.fm/Last.fm Track '" + fb.TitleFormat("%title%").Eval() + "' By '" + fb.TitleFormat("%artist%").Eval() + "' Level 0 Similar Tracks")
+        fb.RunContextCommand("Echo Nest/Playlist/Genius")
+
+    }, "Similar Tracks");
+
+    b.buttons.sartist = new button(x + p.w - 480, i + 50, 40, 40, {
+        normal: 0 == window.GetProperty("2k3.lastfm_mode", 0) ? this.images.sartisth : this.images.sartist,
+        hover: this.images.sartisth
+    }, function() {
+        li.lastfm_change_mode(0);
+        p.console(" clicked__________________sartist");
+    }, "similar artists");
+    b.buttons.tags = new button(x + p.w - 480, i + 85, 40, 40, {
+        normal: 1 == window.GetProperty("2k3.lastfm_mode", 0) ? this.images.tagsh : this.images.tags,
+        hover: this.images.tagsh
+    }, function() {
+        li.lastfm_change_mode(1);
+        p.console("  clicked__________________tags");
+    }, "top tags");
+    b.buttons.talbum = new button(x + p.w - 480, i + 115, 40, 40, {
+        normal: 3 == window.GetProperty("2k3.lastfm_mode", 0) ? this.images.talbumh : this.images.talbum,
+        hover: this.images.talbumh
+    }, function() {
+        li.lastfm_change_mode(3);
+        p.console("  clicked__________________talbum");
+    }, "top albums");
+    b.buttons.top = new button(x + p.w - 472, i + 145, 25, 25, {
+        normal: 4 == window.GetProperty("2k3.lastfm_mode", 0) ? this.images.toph : this.images.top,
+        hover: this.images.toph
+    }, function() {
+        li.lastfm_change_mode(4);
+        p.console("  clicked__________________top tracks");
+    }, "top tracks");
+
+    //   b.buttons.library = new button(5, 5, 45, 45, {
+    //       normal: this.images.library,hover: this.images.libraryh
+    //   }, function() {
+    //       var libraryView = update_option("panel", 2);
+    //       var sideView = update_option("side", 1);
+    //       RefreshBG();RefreshBG();
+    //   }, "Library");
+
+    b.buttons.codec = new button(p.w - 380 + codecX, p.h - 90 - codecY, 60, 40, {
+        normal: trackPath.substr(0, 3) == "www" ? gdi.Image(fb.ProfilePath + "sam92\\images\\Codecs\\stream.png") : gdi.Image(fb.ProfilePath + "sam92\\images\\Codecs\\" + codec + ".png")
+    }, function() {
+        
+    }, "");
+
+    //fb.trace("sam92\\images\\Codecs\\"+codec+".png");
+    //fb.trace"fssdfsdfsdf"+(trackPath.substr(0,3)=="www")?"ok":"no");
+
+    //   b.buttons.video = new button(0, 25, 100, 100, {normal: this.images.video}, function() { 
+    //       fb.RunMainMenuCommand("View/Visualizations/Youtube Video");
+    //       
+    //       
+    //       } , "Video");
+
+    b.buttons.bartist = new button(artistX, artistY, artistW - 70, artistH - 30, {
+        normal: this.images.bartist
+    }, function() {
+        fb.RunContextCommand("Quicksearch for same/Artist");
+        var libraryView = update_option("panel", 2);
+        var sideView = update_option("side", 1);
+        RefreshBG();
+    }, "Browse Artist");
+
+    window.Repaint();
+
+
+
+
+}
+
+b.update();
+
+function on_playback_time(time) {
+
+
+    ps.playback_time(time);
+    //th.playback_time(time);
+    window.RepaintRect(p.w - 250, p.h - 30, 130, gdi.Font("digital-7", 20, 1).Height + 10);
+    if (time != 1) return;
+    p.console("This is the time to determine if images should be automatically downloaded.");
+    if (th.source != 0) return p.console("Panel is in custom folder mode. Not downloading.");
+    if (p.metadb.RawPath != fb.GetNowPlaying().RawPath) return p.console("Panel is not focused on the playing track. Not downloading.");
+    if (th.files.length > 0) return p.console("Folder contains at least one image. Not downloading.");
+    if (th.auto_download == 0) return p.console("Automatic downloads are switched off. Not downloading");
+    if (th.auto_download == 1 && !fb.IsMetadbInMediaLibrary(p.metadb)) return p.console("Automatic downloads are enabled for library tracks only and this track is not in the library. Not downloading.");
+    p.console("All conditions for downloading images have been met. Downloading now...");
+    th.download();
+}
+
+function on_size() {
+
+    p.size();
+    pos_x = 0;
+    pos_y = p.h - 15;
+    th.size();
+    r.x = p.w - rX;
+    r.y = p.h - rY;
+    c.w = p.w < 668 ? cHmin : cW;
+    c.h = p.w < 668 ? cHmin : cH;
+    c.x = p.w < 668 ? cX - 2 : cX;
+    c.y = p.w < 668 ? p.h - cHmin + 33 : p.h - cH+28;
+    ps.x = p.w - 230 + obx;
+    ps.y = p.h - oby;
+    b.update();
+
+    listH = p.w < 668 ? 155 : 105;
+//listH = p.w < 668 ? 105 : 105;
+
+    li.y = 0;
+    li.x = x + p.w - 440;
+    li.w = 270;
+    li.h = p.h - 150;
+
+  //  i = (p.h - 400) / 2;
+
+    li.size();
+    ps.update_button();
+    volknob.changePos(p.w - vX, p.h - vY, vW, vH);
+
+}
+
+function on_paint(gr) {
+
+
+    p.backcolour = RGB(5, 5, 5);
+    p.textcolour = colorSchemeText;
+    // p.textcolour_hl = RGB(255, 255, 254);
+    // p.backcolour = RGB(45, 45, 45); //dark grey background 
+    th.mode = th.modes.off;
+    p.draw_background(gr);
+
+
+    //todo
+    th.draw(gr);
+
+
+
+
+    //DrawPolyStar(gr, p.w-203, p.h - 210, 50, 40, 3, 5, colorSchemeBack, colorSchemeBack, 290);
+    //DrawPolyStar(gr, p.w-198, p.h - 209, 32, 100, 6, 1, colorSchemeBack, colorSchemeBack, -30);
+    //  DrawPolyStar(gr, p.w-193, p.h - 208, 24, 100, 6, 1, colorSchemeBack, colorSchemeBack, -30);
+    //  DrawPolyStar(gr, p.w-188, p.h - 207, 20, 100, 6, 1, colorSchemeBack, colorSchemeBack, -30);
+    //  DrawPolyStar(gr, p.w-183, p.h - 206, 10, 100, 6, 1, colorSchemeBack, colorSchemeBack, -30);
+
+
+
+//    gr.FillGradRect(0, 0, p.w, 5, 100, blendColors(-16777216, colorSchemeBack, 0.3125), RGBA(255, 255, 255, 0));
+    //mid bar
+//    gr.FillGradRect(0, p.h - listH - 30, p.w, 7, 100, RGBA(255, 255, 255, 0), colorSchemeBack & RGBA(255, 255, 255, 255 - 40));
+    //gr.FillGradRect(0,p.h -90, p.w-174, 10, 100,colorSchemeBack & RGBA(255, 255, 255, 255 - 40), RGBA(255, 255, 255, 0));
+
+
+   gr.FillGradRect(0, p.h - listH - 23, p.w, listH / 2 + 15, 30, colorSchemeBack & RGBA(240, 240, 240, 255 - 60), blendColors(-16777216, colorSchemeBack, 0.3125));
+    gr.FillGradRect(0, p.h - listH / 2 - 23 + 15, p.w, listH / 2 + 15, -30, colorSchemeBack & RGBA(240, 240, 240, 255 - 60), blendColors(-16777216, colorSchemeBack, 0.3125));
+
+//seperater ggwp
+    DrawPolyStar(gr, p.w - 320-sty, p.h - 135, 140, 30, 4, 0, RGB(0, 0, 0), colorSchemeBack, -30);
+    DrawPolyStar(gr, p.w - 310-sty, p.h - 135, 140, 30, 4, 0, colorSchemeText, colorSchemeBack, -30);
+    DrawPolyStar(gr, p.w - 300-sty, p.h - 135, 140, 30, 4, 0, colorSchemeText, colorSchemeBack, -30);
+
+
+
+
+    // lyrics background 
+    // gr.FillSolidRect(0, p.h - 40, p.w, 45,blendColors( -16777216,colorSchemeBack,0.3125));
+    // gr.FillGradRect(0,p.h - 50, p.w, 10, 100, RGBA(255, 255, 255, 0), blendColors( -16777216,colorSchemeBack,0.3125));
+
+
+
+
+    //covershade
+    //gr.FillGradRect(220, p.h - 222, 10, 222,10,blendColors( -16777216,colorSchemeBack,0.3125), RGBA(255, 255, 255, 0));
+    //gr.FillGradRect(0, p.h - 226, 222, 10, 80, RGBA(255, 255, 255, 0),blendColors( -16777216,colorSchemeBack,0.3125));
+
+    //gr.FillGradRect(0, p.h - 5, p.w, 5, 100, RGBA(255, 255, 255, 0), RGB(19, 87, 202));
+    c.draw(gr);
+    r.draw(gr);
+
+
+
+
+    var g_font = gdi.Font("Segoe UI", 22, 1);
+    var g_drag = false;
+    var g_textrender = gdi.CreateStyleTextRender();
+
+
+    gr.SetTextRenderingHint(5);
+    gr.SetSmoothingMode(4);
+    gr.SetInterpolationMode(7);
+
+    var ww = window.Width;
+    var wh = window.Height;
+
+
+
+    g_textrender.GlowText(blendColors(RGB(255, 255, 255), colorSchemeBack, 0.3125), blendColors(-16777216, colorSchemeBack, 0.3125) & RGBA(255, 255, 255, 40), 12);
+
+    // Clear previous shadow setting
+    g_textrender.EnableShadow(true);
+    g_textrender.ResetShadow();
+
+
+
+//similer background  
+    gr.FillSolidRect(p.w - 165, 0, 175, p.h -178, colorSchemeBack & RGBA(255, 255, 255, 255 - 40));
+
+
+   // gr.FillSolidRect(cW-30, p.h -185, p.w,58, colorSchemeBack & RGBA(255, 255, 255, 255 - 40));
+
+
+
+    var len = gr.CalcTextWidth(line2.text, line2.font);
+    
+    //fb.trace("length string :  "+len);
+
+
+
+
+
+    //info
+    
+    
+    
+    if(p.w < 668){
+        
+    g_textrender.RenderStringRect(gr, line2.text, len < p.w - cHmin ? line2.font : line2.fontmin, p.w < 668 ? line2.xMin : line2.x, len < p.w - 10 ? p.h -250 +line2.y  +10-infoY+95: p.h -250+  line2.y+10, p.w < 668 ? p.w - 350 : p.w - 550, line2.font.Height * 2, 0x01008000);
+    g_textrender.RenderStringRect(gr, line1.text, line11.font,line11.xMin,  p.h - line11.yMin, 500, line11.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+    g_textrender.RenderStringRect(gr, line3.text, p.w < 668 ? line3.font : line3.font, p.w < 668 ? line3.xMin : line3.x, p.w < 668 ? p.h - line3.yMin : p.h - line3.y, 500, line3.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+}else{
+    g_textrender.RenderStringRect(gr, line2.text, len < p.w - cH -228? line2.font : line2.fontmin, p.w < 668 ? line2.xMin : line2.x, len < p.w - 550 ? p.h - 120 + line2.y - 10 : p.h - 120 + line2.y, p.w < 668 ? p.w - 350 : p.w - 550, line2.font.Height * 2, 0x01008000);
+    g_textrender.RenderStringRect(gr, line1.text, p.w < 668 ? line11.font : line11.font, p.w < 668 ? line11.xMin : line11.x,  p.h -line11.y, 500, line11.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+    g_textrender.RenderStringRect(gr, line3.text, p.w < 668 ? line3.font : line3.font, p.w < 668 ? line3.xMin : line3.x, p.w < 668 ? p.h - line3.yMin : p.h - line3.y, 500, line3.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+}
+
+
+    //p.left_text(gr, line2.text, line2.font, colorSchemeText, z + 240, p.h - 150 + line2.y, 500, line2.font.Height);
+    //p.left_text(gr, line3.text, line3.font, colorSchemeText, z + 240, p.h - 150 + line3.y, 500, line3.font.Height);
+    // p.left_text(gr, line4.text, line4.font, line4.colour, 0, p.h - 150 + line4.y, 900, line4.font.Height);
+
+
+
+
+    g_textrender.RenderStringRect(gr, line5.text, line5.font, p.w - line5.x, p.h - 125 + line5.y, 300, line5.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+    g_textrender.RenderStringRect(gr, line6.text, line6.font, p.w - line6.x, p.h - 125 + line6.y, 500, line6.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+
+
+    //p.left_text(gr, line5.text, line5.font, colorSchemeText & negative(colorSchemeBack) , p.w-line5.x, p.h - 125 + line5.y, 900, line5.font.Height);
+    //p.left_text(gr, line6.text, line6.font, colorSchemeText , p.w-line6.x, p.h - 125 + line6.y, 900, line6.font.Height); 
+
+
+    //if(!fb.IsPlaying) {
+    //    p.left_text(gr, p.eval("%length%"), font, color,x, y, w, h);
+    // }
+
+    
+
+    //DrawPolyStar(gr, p.w-200, p.h - 215, 70, 30, 4, 0, RGB(0,0,0), negative(colorSchemeBack), -30);
+    //DrawPolyStar(gr, p.w-200, p.h - 150, 70, 30, 4, 0, RGB(0,0,0), negative(colorSchemeBack), 30);
+
+    // gr.GdiDrawText("88:88/88:88", gdi.Font("Digital", 31, 0), colorSchemeBack & RGBA(255, 255, 255, 0), p.w- 149, p.h - 75, 140, gdi.Font("digital", 30, 0).Height + 10, 0x00000002);
+   // gr.GdiDrawText(Format_hms(fb.TitleFormat("%playback_time%").Eval()) + "/" + Format_hms(fb.TitleFormat("[%length%]").Eval()), gdi.Font("Digital", 30, 0), blendColors(-16777216, colorSchemeBack, 0.3125), p.w - 251, p.h - 30, 240, gdi.Font("digital", 30, 0).Height + 10, 0x00000002);
+
+    // todo time
+
+
+    gr.FillGradRect(0, 0, 7, p.h,190, RGBA(255, 255, 255, 0), blendColors(-16777216, colorSchemeBack, 0.3125));
+
+   gr.FillGradRect(p.w - 7, 0, 7, p.h, 180, blendColors(-16777216, colorSchemeBack, 0.3125), RGBA(255, 255, 255, 10));
+    b.draw(gr);
+    li.draw(gr);
+
+    //li2.draw(gr);
+
+    if (g_img) {
+        var ww = artistW,
+            wh = artistH;
+
+        var x = 0,
+            y = 0;
+        var scale = 0;
+        var scale_w = ww / g_img.Width;
+        var scale_h = wh / g_img.Height;
+
+        if (scale_w <= scale_h) {
+            scale = scale_w;
+            y = (wh - g_img.Height * scale) / 2;
+
+        } else {
+            scale = scale_h;
+            x = (ww - g_img.Width * scale) / 2;
+            //y=100;
+        }
+
+
+
+        gr.DrawImage(g_img, artistX + (x / 2), artistY + y, g_img.Width * scale, g_img.Height * scale, 0, 0, g_img.Width, g_img.Height);
+
+
+
+
+    } else {
+        // p.left_text(gr, line1.text, line1.font, colorSchemeText, z + 240, p.h - 170, 500, line1.font.Height);
+        g_textrender.RenderStringRect(gr, line1.text, p.w < 668 ? line1.fontMin : line1.font, artistX, artistY, 900, line1.font.Height, DT_VCENTER | DT_END_ELLIPSIS | DT_CALCRECT | DT_NOPREFIX);
+
+    }
+
+    volknob.draw(gr);
+
+    // gr.GdiDrawText(line2.text, line2.font, RGB(255,255,255),260, 380,600, line2.font.Height, format = 0);
+}
+
+
+function on_playback_stop() {
+    b.update();
+}
+
+function on_playback_pause() {
+    b.update();
+}
+
+function on_playback_starting() {
+    b.update();
+}
+
+function on_metadb_changed() {
+
+
+
+    th.metadb_changed();
+    r.metadb_changed();
+    li.metadb_changed();
+
+    c.metadb_changed();
+    getColorSchemeFromImage(c.img);
+    
+
+
+    
+     
+    
+    line1.text = p.eval(line1.tf);
+    line2.text = p.eval(line2.tf);
+    line3.text = p.eval(line3.tf);
+    line4.text = p.eval(line4.tf);
+    line5.text = p.eval(line5.tf);
+    line6.text = p.eval(line6.tf);
+
+    //todo
+
+    // var my_font = gdi.Font("PCDE", 55, 3);
+
+
+
+
+    //   fb.trace(CalcTextWidth("abcd", gdi.Font("PCDE", 55, 3)));
+
+    codec = p.eval("[%codec%]");
+    trackPath = p.eval("[%path%]");
+    //$stricmp($substr(%path%,1,4),http);
+
+    // fb.trace("sam92\\images\\Codecs\\"+codec+".png");
+    b.update();
+    ps.metadb_changed();
+    update_option("video", 0);
+
+}
+
+function on_playback_new_track() {
+    ps.playback_new_track();
+
+    load_random_image_async();
+
+}
+
+function on_playback_edited() {
+    ps.playback_edited();
+}
+
+function on_get_album_art_done(metadb, art_id, im, ip) {
+    c.get_album_art_done(ip);
+}
+
+function on_mouse_wheel(step) {
+    //if(th.wheel(step)) return;
+    // if(li.wheel(step)) return;
+    if (volknob.on_mouse_wheel(step)) return;
+}
+
+function on_mouse_move(x, y) {
+    if (p.move(x, y)) return;
+
+    if (b.move(x, y)) return;
+    if (r.move(x, y)) return;
+    if (c.move(x, y)) return;
+    if (b.move(x, y)) return;
+    if (li.move(x, y)) return;
+    //if (li2.move(x, y)) return;
+    //if (volknob.on_mouse_move(x, y)) return;
+}
+
+function on_mouse_lbtn_up(x, y) {
+    //if (c.lbtn_up(x, y)) fb.RunContextCommand("Quicksearch for same/Album");
+
+    if (b.lbtn_up(x, y)) return;
+    if (r.lbtn_up(x, y)) return;
+    if (th.lbtn_up(x, y)) return;
+    if (li.lbtn_up(x, y)) return;
+    if (volknob.on_mouse_lbtn_up(x, y)) return;
+
+}
+
+function on_mouse_lbtn_down(x, y) {
+
+    if (volknob.on_mouse_lbtn_down(x, y)) return;
+}
+
+
+function on_mouse_lbtn_dblclk(x, y) {
+    if (c.lbtn_dblclk(x, y)) return;
+    th.lbtn_dblclk(x, y);
+}
+
+
+var v_timer = null;
+
+function on_volume_change(val) {
+    if (v_timer) {
+        window.ClearTimeout(v_timer);
+        v_timer = null;
+    }
+
+    v_timer = window.SetTimeout(
+        function() {
+            volknob.Repaint();
+            window.ClearTimeout(v_timer);
+            v_timer = null;
+            v_change = false;
+        }, 3000);
+
+    v_change = true;
+    volknob.Repaint();
+}
+
+
+function on_mouse_rbtn_up(x, y) {
+    if (volknob.traceMouse(x, y)) {
+        volknob.on_mouse_rbtn_up(x, y);
+        return true;
+    }
+
+
+
+    try {
+        //some dodgy code
+
+
+        if (utils.IsKeyPressed(0x10)) return false;
+        p.rbtn_up(x, y);
+        return true;
+    } catch (e) {
+        //something went wrong but at least the script didn't crash
+
+        fb.trace("ggwp stack overflow");
+    }
+
+
+    //  todo
+
+
+
+
+}
